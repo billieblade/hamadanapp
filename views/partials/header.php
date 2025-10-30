@@ -27,18 +27,18 @@
         <li class="nav-item"><a class="nav-link" href="/?route=customers">Clientes</a></li>
         <li class="nav-item"><a class="nav-link" href="/?route=customers-new">Adicionar Clientes</a></li>
 
-        <!-- Serviços -->
-        <li class="nav-item"><a class="nav-link" href="/?route=services">Serviços</a></li>
-        <li class="nav-item"><a class="nav-link" href="/?route=services-new">Adicionar Serviços</a></li>
+        <!-- Servi莽os -->
+        <li class="nav-item"><a class="nav-link" href="/?route=services">Servi莽os</a></li>
+        <li class="nav-item"><a class="nav-link" href="/?route=services-new">Adicionar Servi莽os</a></li>
 
         <!-- Tapetes -->
         <li class="nav-item"><a class="nav-link" href="/?route=tapetes">Tapetes</a></li>
 
-        <!-- Relatórios -->
-        <li class="nav-item"><a class="nav-link" href="/?route=reports">Relatórios</a></li>
+        <!-- Relat贸rios -->
+        <li class="nav-item"><a class="nav-link" href="/?route=reports">Relat贸rios</a></li>
 
-        <!-- Preços -->
-        <li class="nav-item"><a class="nav-link" href="/?route=prices">Preços</a></li>
+        <!-- Pre莽os -->
+        <li class="nav-item"><a class="nav-link" href="/?route=prices">Pre莽os</a></li>
       </ul>
 
       <span class="navbar-text text-light me-3">
