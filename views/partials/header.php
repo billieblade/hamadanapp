@@ -29,7 +29,7 @@
 
         <!-- Serviços -->
         <li class="nav-item"><a class="nav-link" href="/?route=services">Serviços</a></li>
-        <li class="nav-item"><a class="nav-link" href="/?route=services-new">Adicionar Serviços</a></li>
+        <li class="nav-item"><a class="nav-link" href="/?route=quotes-new">Adicionar Serviços</a></li>
 
         <!-- Tapetes -->
         <li class="nav-item"><a class="nav-link" href="/?route=tapetes">Tapetes</a></li>
