@@ -39,6 +39,19 @@ CREATE TABLE IF NOT EXISTS services (
   FOREIGN KEY (price_list_id) REFERENCES price_lists(id)
 );
 
+CREATE TABLE IF NOT EXISTS services_all (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  categoria ENUM('CORTINAS','PERSIANAS','CARPETE','ESTOFADOS','TAPETES') NOT NULL,
+  nome VARCHAR(160) NOT NULL,
+  unidade ENUM('m2','ml','peca') NOT NULL DEFAULT 'm2',
+  preco_final DECIMAL(10,2) NOT NULL DEFAULT 0,
+  preco_corporativo DECIMAL(10,2) NOT NULL DEFAULT 0,
+  observacao VARCHAR(255),
+  ativo TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS quotes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT, user_id INT, price_list_id INT,
@@ -62,6 +75,18 @@ CREATE TABLE IF NOT EXISTS quote_items (
   FOREIGN KEY (service_id) REFERENCES services(id)
 );
 
+CREATE TABLE IF NOT EXISTS quote_item_services (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  quote_item_id INT NOT NULL,
+  service_all_id INT NOT NULL,
+  qtd DECIMAL(10,2) NOT NULL DEFAULT 1,
+  preco_unitario DECIMAL(10,2) NOT NULL DEFAULT 0,
+  subtotal DECIMAL(10,2) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (quote_item_id) REFERENCES quote_items(id) ON DELETE CASCADE,
+  FOREIGN KEY (service_all_id) REFERENCES services_all(id)
+);
+
 CREATE TABLE IF NOT EXISTS work_orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   quote_id INT, codigo_os VARCHAR(32) UNIQUE,
@@ -73,7 +98,7 @@ CREATE TABLE IF NOT EXISTS work_orders (
 CREATE TABLE IF NOT EXISTS work_order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   work_order_id INT, quote_item_id INT,
-  etiqueta_codigo VARCHAR(64) UNIQUE, status_item VARCHAR(32) DEFAULT 'aberto',
+  etiqueta_codigo VARCHAR(64) UNIQUE, status_item VARCHAR(32) DEFAULT 'EM_TRANSITO',
   FOREIGN KEY (work_order_id) REFERENCES work_orders(id),
   FOREIGN KEY (quote_item_id) REFERENCES quote_items(id)
 );

@@ -1,7 +1,7 @@
 <?php
 $q = $_GET['q'] ?? '';
 $st = $pdo->prepare("SELECT * FROM customers WHERE nome LIKE ? ORDER BY id DESC LIMIT 200");
-$st->execute(['%'.$q+'%']);  # safe concat for display
+$st->execute(['%' . $q . '%']);  # safe concat for display
 $rows = $st->fetchAll();
 ?>
 <div class="container py-4">
