@@ -1,0 +1,8 @@
+[29-Oct-2025 21:00:23 America/Fortaleza] PHP Fatal error:  Uncaught Error: Call to undefined function require_login() in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/quotes_new.php:3
+Stack trace:
+#0 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/quotes_new.php on line 3
+[29-Oct-2025 21:00:28 America/Fortaleza] PHP Fatal error:  Uncaught Error: Call to undefined function require_login() in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/quotes_new.php:3
+Stack trace:
+#0 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/quotes_new.php on line 3

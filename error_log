@@ -1,0 +1,101 @@
+[29-Oct-2025 18:35:23 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:35:35 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:35:37 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'created_at' in field list is ambiguous in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php:6
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php(6): PDO->query('SELECT DATE(cre...')
+#1 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(26): include('/home2/cervejac...')
+#2 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php on line 6
+[29-Oct-2025 18:35:55 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'created_at' in field list is ambiguous in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php:6
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php(6): PDO->query('SELECT DATE(cre...')
+#1 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(26): include('/home2/cervejac...')
+#2 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php on line 6
+[29-Oct-2025 18:35:57 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:42:47 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:43:20 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:43:39 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:43:40 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:44:22 America/Sao_Paulo] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/cervejac/hamadanapp.cervejacomogros.com.br/views/partials/header.php:1) in /home2/cervejac/hamadanapp.cervejacomogros.com.br/app/helpers.php on line 4
+[29-Oct-2025 18:44:25 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 18:44:27 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 19:25:07 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(17): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 19:53:38 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(19): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 20:16:04 America/Sao_Paulo] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php:4
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(19): include()
+#1 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/customers_list.php on line 4
+[29-Oct-2025 20:16:09 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 31
+[29-Oct-2025 20:16:09 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 31
+[29-Oct-2025 20:16:17 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'created_at' in field list is ambiguous in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php:6
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php(6): PDO->query('SELECT DATE(cre...')
+#1 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(39): include('/home2/cervejac...')
+#2 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php on line 6
+[29-Oct-2025 20:16:38 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 31
+[29-Oct-2025 20:16:38 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 31
+[29-Oct-2025 20:25:24 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:25:24 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:25:33 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'created_at' in field list is ambiguous in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php:6
+Stack trace:
+#0 /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php(6): PDO->query('SELECT DATE(cre...')
+#1 /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php(70): include('/home2/cervejac...')
+#2 {main}
+  thrown in /home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/reports.php on line 6
+[29-Oct-2025 20:31:05 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:31:05 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:39:33 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:39:33 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:54:06 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:54:06 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:59:13 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:59:13 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:59:15 America/Sao_Paulo] PHP Warning:  include(/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php): Failed to open stream: No such file or directory in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56
+[29-Oct-2025 20:59:15 America/Sao_Paulo] PHP Warning:  include(): Failed opening '/home2/cervejac/hamadanapp.cervejacomogros.com.br/pages/services_list.php' for inclusion (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home2/cervejac/hamadanapp.cervejacomogros.com.br/index.php on line 56

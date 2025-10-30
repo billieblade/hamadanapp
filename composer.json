@@ -1,0 +1,13 @@
+{
+  "name": "hamadan/mvp",
+  "description": "Hamadan App - Or\u00e7amentos -> OS -> Etiquetas",
+  "require": {
+    "dompdf/dompdf": "^2.0",
+    "chillerlan/php-qrcode": "^4.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
