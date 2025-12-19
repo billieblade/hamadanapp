@@ -1,204 +1,40 @@
-/* ================================
-   HAMDANAPP - ESTILO GLOBAL
-   ================================ */
-
-/* ---------- BASE ---------- */
-:root {
-  --primary: #0d6efd;
-  --dark: #212529;
-  --light: #f8f9fa;
-  --accent: #198754;
-  --danger: #dc3545;
-  --radius: 10px;
-  --shadow: 0 2px 6px rgba(0,0,0,0.1);
+:root{
+  --primary:#0d6efd; --dark:#212529; --light:#f8f9fa; --accent:#198754; --danger:#dc3545;
+  --radius:12px; --shadow:0 6px 18px rgba(0,0,0,.08);
 }
-
-html, body {
-  height: 100%;
-  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
-  background-color: var(--light);
-  color: var(--dark);
+html,body{height:100%;background:var(--light);}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#222;line-height:1.35;}
+.navbar{box-shadow:var(--shadow);} .navbar-brand{font-weight:700;letter-spacing:.4px;}
+.container .card{border:none;border-radius:var(--radius);box-shadow:var(--shadow);}
+.card-header{background:var(--primary);color:#fff;border-top-left-radius:var(--radius);border-top-right-radius:var(--radius);}
+.form-control,.form-select{border-radius:10px;}
+.form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 .2rem rgba(13,110,253,.15);}
+.btn{border-radius:10px;font-weight:600;} .btn-outline-primary:hover{background:var(--primary);color:#fff;}
+.table{font-size:.95rem;} .table thead{background:#eef1f4;} .table td,.table th{vertical-align:middle;}
+.badge{border-radius:8px;padding:.45em .6em;}
+/* Mobile-first tweaks */
+@media (max-width: 576px){
+  .navbar .btn{padding:.35rem .6rem}
+  .table{font-size:.90rem;}
+  .card-body{padding:1rem;}
+  .container{padding-left:.5rem; padding-right:.5rem;}
+  .form-control, .form-select{font-size:1rem;}
+  .label-row{flex-direction:column;}
 }
-
-/* ---------- NAVBAR ---------- */
-.navbar {
-  box-shadow: var(--shadow);
+/* Label layout: horizontal */
+.label-sheet{display:flex;flex-wrap:wrap;gap:10px}
+.label-box{
+  width: 85mm; height: 48mm;
+  border: 2px dashed #666; border-radius: 10px;
+  background:#fff; padding:8px; display:flex; flex-direction:row; align-items:center; justify-content:space-between;
 }
-
-.navbar-brand {
-  font-weight: 700;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-}
-
-.navbar-nav .nav-link {
-  color: #e9ecef !important;
-  transition: all .2s;
-}
-
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link.active {
-  color: var(--primary) !important;
-  background-color: rgba(255,255,255,0.1);
-  border-radius: var(--radius);
-}
-
-/* ---------- CONTAINERS ---------- */
-.container {
-  max-width: 1200px;
-}
-
-.card {
-  border: none;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.card-header {
-  background-color: var(--primary);
-  color: white;
-  font-weight: 500;
-  border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
-}
-
-/* ---------- FORMULÁRIOS ---------- */
-.form-label {
-  font-weight: 500;
-  color: #333;
-}
-
-.form-control, .form-select {
-  border-radius: var(--radius);
-  border-color: #ced4da;
-  transition: all .2s;
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15);
-}
-
-.btn {
-  border-radius: var(--radius);
-  font-weight: 500;
-  transition: all .2s;
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  border-color: var(--primary);
-}
-
-.btn-primary:hover {
-  background-color: #0b5ed7;
-}
-
-.btn-outline-primary {
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.btn-outline-primary:hover {
-  background-color: var(--primary);
-  color: white;
-}
-
-.btn-outline-secondary:hover {
-  background-color: #6c757d;
-  color: white;
-}
-
-/* ---------- TABELAS ---------- */
-.table {
-  font-size: 0.9rem;
-}
-
-.table thead {
-  background-color: #e9ecef;
-}
-
-.table-striped>tbody>tr:nth-of-type(odd)>* {
-  background-color: rgba(0,0,0,.02);
-}
-
-.table td, .table th {
-  vertical-align: middle;
-}
-
-.table input, .table select {
-  min-width: 90px;
-}
-
-.table input[type="number"] {
-  text-align: right;
-}
-
-/* ---------- ALERTAS E BADGES ---------- */
-.alert {
-  border-radius: var(--radius);
-}
-
-.badge {
-  font-size: .8rem;
-  padding: .4em .6em;
-  border-radius: var(--radius);
-}
-
-/* ---------- MOBILE ADAPTAÇÃO ---------- */
-@media (max-width: 768px) {
-  .table-responsive {
-    overflow-x: auto;
-  }
-  .btn {
-    width: 100%;
-    margin-bottom: .5rem;
-  }
-  .navbar-nav .nav-link {
-    padding: 0.6rem 1rem;
-  }
-}
-
-/* ---------- ETIQUETAS (labels-print) ---------- */
-.label-box {
-  width: 280px;
-  height: 140px;
-  border: 2px dashed #999;
-  border-radius: 8px;
-  padding: 10px;
-  margin: 10px;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.label-box img.logo {
-  max-height: 40px;
-  margin-bottom: 5px;
-}
-
-.label-box .code {
-  font-weight: bold;
-  font-size: 1rem;
-}
-
-.label-box small {
-  color: #555;
-}
-
-/* ---------- RELATÓRIOS ---------- */
-.report-summary {
-  background-color: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.report-summary h5 {
-  border-bottom: 2px solid var(--primary);
-  padding-bottom: .4rem;
-  margin-bottom: .8rem;
+.label-left{display:flex;flex-direction:column;gap:4px;max-width:52%;}
+.label-left img.logo{max-height:20px;object-fit:contain;}
+.label-left .code{font-weight:800;letter-spacing:.5px;font-size:14px;}
+.label-left small{color:#444;line-height:1.1;}
+.label-right img{height:44px;width:44px;object-fit:contain;}
+@media print {
+  body{background:#fff;}
+  .no-print{display:none!important;}
+  .label-box{page-break-inside:avoid; border:1px solid #000;}
 }

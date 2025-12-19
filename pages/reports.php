@@ -1,80 +1,27 @@
 <?php
-require_role(['master']);
-$ini = $_GET['ini'] ?? date('Y-m-01');
-$fim = $_GET['fim'] ?? date('Y-m-d');
-
-$diario = $pdo->query("SELECT DATE(created_at) dia, COUNT(*) os, SUM(q.total) valor
-FROM work_orders w JOIN quotes q ON q.id=w.quote_id
-GROUP BY DATE(created_at) ORDER BY dia DESC LIMIT 30")->fetchAll();
-
-$ps = $pdo->prepare("SELECT s.nome, s.unidade, SUM(qi.qtd) qtd, SUM(qi.subtotal) total
-FROM quote_items qi JOIN services s ON s.id=qi.service_id
-JOIN quotes q ON q.id=qi.quote_id
-WHERE q.created_at BETWEEN ? AND ?
-GROUP BY s.id ORDER BY total DESC LIMIT 50");
-$ps->execute([$ini.' 00:00:00',$fim.' 23:59:59']);
-$por_servico = $ps->fetchAll();
-
-if(isset($_GET['export']) && $_GET['export']==='csv'){
-  header('Content-Type: text/csv; charset=utf-8');
-  header('Content-Disposition: attachment; filename=relatorio.csv');
-  $out = fopen('php://output', 'w');
-  if($_GET['type']==='por_servico'){
-    fputcsv($out, ['Serviço','Unidade','Qtd','Total']);
-    $stmt = $pdo->prepare("SELECT s.nome, s.unidade, SUM(qi.qtd) qtd, SUM(qi.subtotal) total
-      FROM quote_items qi JOIN services s ON s.id=qi.service_id
-      JOIN quotes q ON q.id=qi.quote_id
-      WHERE q.created_at BETWEEN ? AND ?
-      GROUP BY s.id ORDER BY total DESC");
-    $stmt->execute([$ini.' 00:00:00', $fim.' 23:59:59']);
-    foreach($stmt as $r){ fputcsv($out, [$r['nome'],$r['unidade'],$r['qtd'],$r['total']]); }
-    fclose($out); exit;
-  }
-}
-
-?>
-<div class="container py-4">
-  <h3>Relatórios</h3>
-  <form class="row g-2 mb-3">
-    <input type="hidden" name="route" value="reports">
-    <div class="col-auto"><label class="form-label">De</label><input type="date" name="ini" class="form-control" value="<?=h($ini)?>"></div>
-    <div class="col-auto"><label class="form-label">Até</label><input type="date" name="fim" class="form-control" value="<?=h($fim)?>"></div>
-    <div class="col-auto align-self-end"><button class="btn btn-outline-secondary">Aplicar</button></div>
-  </form>
-
-  <div class="row">
-    <div class="col-md-6">
-      <div class="card mb-3">
-        <div class="card-header">OS por dia (últimos 30 registros)</div>
-        <div class="card-body">
-          <table class="table table-sm">
-            <thead><tr><th>Dia</th><th>OS</th><th>Valor</th></tr></thead>
-            <tbody>
-              <?php foreach($diario as $r): ?>
-                <tr><td><?=$r['dia']?></td><td><?=$r['os']?></td><td>R$ <?=number_format($r['valor'],2,',','.')?></td></tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card mb-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Top serviços (por período)</span>
-          <a class="btn btn-sm btn-outline-secondary" href="/?route=reports&ini=<?=$ini?>&fim=<?=$fim?>&export=csv&type=por_servico">Exportar CSV</a>
-        </div>
-        <div class="card-body">
-          <table class="table table-sm">
-            <thead><tr><th>Serviço</th><th>Unid</th><th>Qtd</th><th>Total</th></tr></thead>
-            <tbody>
-              <?php foreach($por_servico as $r): ?>
-                <tr><td><?=h($r['nome'])?></td><td><?=$r['unidade']?></td><td><?=$r['qtd']?></td><td>R$ <?=number_format($r['total'],2,',','.')?></td></tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+require_login();
+$users=$pdo->query("SELECT id,name FROM users WHERE ativo=1 ORDER BY name")->fetchAll();
+$customers=$pdo->query("SELECT id,nome FROM customers ORDER BY nome")->fetchAll();
+$u=(int)($_GET['user_id']??0); $cst=(int)($_GET['customer_id']??0); $from=$_GET['from']??''; $to=$_GET['to']??''; $params=[]; $where='WHERE 1=1';
+if($u){ $where.=" AND wo.user_id=?"; $params[]=$u; }
+if($cst){ $where.=" AND wo.customer_id=?"; $params[]=$cst; }
+if($from){ $where.=" AND DATE(wo.created_at)>=?"; $params[]=$from; }
+if($to){ $where.=" AND DATE(wo.created_at)<=?"; $params[]=$to; }
+$rows=$pdo->prepare("SELECT wo.id,wo.codigo_os,wo.total,wo.created_at,c.nome FROM work_orders wo JOIN customers c ON c.id=wo.customer_id $where ORDER BY wo.id DESC LIMIT 1000"); $rows->execute($params); $rows=$rows->fetchAll();
+$sum=0; foreach($rows as $r){ $sum+=$r['total']; }
+?><h3>Relatórios</h3>
+<form class="row g-2 mb-3"><input type="hidden" name="route" value="reports">
+<div class="col-md-3"><label class="form-label">Usuário</label><select name="user_id" class="form-select"><option value="0">Todos</option>
+<?php foreach($users as $us): ?><option value="<?=$us['id']?>" <?=$u===$us['id']?'selected':''?>><?=h($us['name'])?></option><?php endforeach;?></select></div>
+<div class="col-md-3"><label class="form-label">Cliente</label><select name="customer_id" class="form-select"><option value="0">Todos</option>
+<?php foreach($customers as $cs): ?><option value="<?=$cs['id']?>" <?=$cst===$cs['id']?'selected':''?>><?=h($cs['nome'])?></option><?php endforeach;?></select></div>
+<div class="col-md-2"><label class="form-label">De</label><input type="date" name="from" class="form-control" value="<?=h($from)?>"></div>
+<div class="col-md-2"><label class="form-label">Até</label><input type="date" name="to" class="form-control" value="<?=h($to)?>"></div>
+<div class="col-md-2 d-flex align-items-end"><button class="btn btn-outline-secondary w-100">Filtrar</button></div></form>
+<div class="card"><div class="card-header">OS no período</div><div class="card-body p-0"><div class="table-responsive">
+<table class="table table-striped mb-0"><thead><tr><th>OS</th><th>Cliente</th><th>Valor</th><th>Data</th><th></th></tr></thead><tbody>
+<?php foreach($rows as $r): ?><tr><td><?=h($r['codigo_os'])?></td><td><?=h($r['nome'])?></td><td>R$ <?=number_format($r['total'],2,',','.')?></td><td><?=h($r['created_at'])?></td>
+<td><a class="btn btn-sm btn-outline-primary" href="/?route=wo-view&id=<?=$r['id']?>">Abrir</a></td></tr><?php endforeach; if(!$rows): ?>
+<tr><td colspan="5" class="text-center p-4">Nada encontrado.</td></tr><?php endif; ?></tbody>
+<?php if($rows): ?><tfoot><tr><th colspan="2" class="text-end">Total</th><th>R$ <?=number_format($sum,2,',','.')?></th><th colspan="2"></th></tr></tfoot><?php endif; ?>
+</table></div></div></div>
