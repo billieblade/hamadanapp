@@ -1,3 +1,1 @@
-<?php
-require __DIR__.'/app/auth.php';
-logout();
+<?php session_start(); require __DIR__.'/app/auth.php'; logout(); header('Location: /login.php');

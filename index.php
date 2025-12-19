@@ -4,82 +4,41 @@ require __DIR__.'/app/db.php';
 require __DIR__.'/app/auth.php';
 require __DIR__.'/app/helpers.php';
 
-// Protege rotas
-if (!isset($_SESSION['uid']) && basename($_SERVER['PHP_SELF']) !== 'login.php') {
-    header('Location: /login.php');
-    exit;
-}
-
-// Define rota
 $route = $_GET['route'] ?? 'dashboard';
 
-// Inclui topo e header (navbar)
-include __DIR__.'/views/partials/header.php';
+// Rotas públicas (não exigem login)
+$PUBLIC_ROUTES = ['wo-view'];
 
-// Controle de páginas
-switch ($route) {
-
-  // Dashboard inicial
-  case 'dashboard':
-    include __DIR__.'/pages/dashboard.php';
-    break;
-
-  // --- Clientes ---
-  case 'customers':
-    include __DIR__.'/pages/customers_list.php';
-    break;
-
-  case 'customers-new':
-    include __DIR__.'/pages/customers_new.php';
-    break;
-
-  // --- Orçamentos e Ordens de Serviço ---
-  case 'quotes-new':
-    include __DIR__.'/pages/quotes_new.php';
-    break;
-
-  case 'quotes-view':
-    include __DIR__.'/pages/quotes_view.php';
-    break;
-
-  case 'os-view':
-    include __DIR__.'/pages/os_view.php';
-    break;
-
-  // --- Etiquetas ---
-  case 'labels-print':
-    include __DIR__.'/pages/labels_print.php';
-    break;
-
-  // --- Serviços (novo modelo único) ---
-  case 'services':
-    include __DIR__.'/pages/services_list.php';
-    break;
-
-  case 'services-new':
-    include __DIR__.'/pages/services_new.php';
-    break;
-
-  // --- Tapetes (com estágios) ---
-  case 'tapetes':
-    include __DIR__.'/pages/tapetes.php';
-    break;
-
-  // --- Relatórios ---
-  case 'reports':
-    include __DIR__.'/pages/reports.php';
-    break;
-
-  // --- Preços (edição em massa dos dois tipos) ---
-  case 'prices':
-    include __DIR__.'/pages/prices.php';
-    break;
-
-  // Página padrão (erro)
-  default:
-    echo "<div class='container py-4'><h3>Página não encontrada</h3></div>";
-    break;
+// Gate de login: só bloqueia se NÃO for rota pública
+if (!in_array($route, $PUBLIC_ROUTES, true) && empty($_SESSION['uid']) && basename($_SERVER['PHP_SELF']) !== 'login.php') {
+  header('Location: /login.php'); exit;
 }
 
-// Rodapé opcional
+include __DIR__.'/views/partials/header.php';
+
+switch($route){
+  case 'dashboard':         include __DIR__.'/pages/dashboard.php'; break;
+
+  case 'customers':         include __DIR__.'/pages/customers_list.php'; break;
+  case 'customers-new':     include __DIR__.'/pages/customers_new.php'; break;
+  case 'customers-edit':    include __DIR__.'/pages/customers_edit.php'; break;
+  case 'customers-delete':  include __DIR__.'/pages/customers_delete.php'; break;
+
+  case 'services':          include __DIR__.'/pages/services.php'; break;
+
+  case 'wo-new':            include __DIR__.'/pages/wo_new.php'; break;
+  case 'wo-view':           include __DIR__.'/pages/wo_view.php'; break;   // ← PÚBLICA
+  case 'wo-delete':         include __DIR__.'/pages/wo_delete.php'; break;
+
+  case 'labels-print':      include __DIR__.'/pages/labels_print.php'; break;
+  case 'status-update':     include __DIR__.'/pages/status_update.php'; break;
+  case 'reports':           include __DIR__.'/pages/reports.php'; break;
+
+  // (opcional) rota de ajuste de senha interna
+  case 'adjust-password':   include __DIR__.'/pages/adjust_password.php'; break;
+
+  default:
+    echo "<div class='container py-4'><h3>Página não encontrada</h3></div>";
+}
+
 include __DIR__.'/views/partials/footer.php';
