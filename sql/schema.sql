@@ -104,6 +104,16 @@ CREATE TABLE IF NOT EXISTS work_orders (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS receipts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  work_order_id INT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  forma_pagto ENUM('dinheiro','debito','credito','pix') NOT NULL,
+  emitido_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  observacao TEXT,
+  FOREIGN KEY (work_order_id) REFERENCES work_orders(id)
+);
+
 CREATE TABLE IF NOT EXISTS work_order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   work_order_id INT NOT NULL,
@@ -146,6 +156,7 @@ CREATE INDEX IF NOT EXISTS idx_services_cat ON services(categoria, ativo, nome);
 CREATE INDEX IF NOT EXISTS idx_services_all_cat ON services_all(categoria, ativo, nome);
 CREATE INDEX IF NOT EXISTS idx_wo_customer ON work_orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_wo_status ON work_orders(status);
+CREATE INDEX IF NOT EXISTS idx_receipts_work_order ON receipts(work_order_id);
 CREATE INDEX IF NOT EXISTS idx_items_status ON work_order_items(status_item);
 CREATE INDEX IF NOT EXISTS idx_item_services ON work_item_services(work_item_id, service_id);
 

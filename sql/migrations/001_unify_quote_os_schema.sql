@@ -121,6 +121,19 @@ DEALLOCATE PREPARE stmt;
 CREATE INDEX IF NOT EXISTS idx_wo_customer ON work_orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_wo_status ON work_orders(status);
 
+-- Receipts for work orders
+CREATE TABLE IF NOT EXISTS receipts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  work_order_id INT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  forma_pagto ENUM('dinheiro','debito','credito','pix') NOT NULL,
+  emitido_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  observacao TEXT,
+  FOREIGN KEY (work_order_id) REFERENCES work_orders(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX IF NOT EXISTS idx_receipts_work_order ON receipts(work_order_id);
+
 -- Work order items: ensure quote reference + subtotal
 ALTER TABLE work_order_items
   ADD COLUMN IF NOT EXISTS quote_item_id INT NULL,

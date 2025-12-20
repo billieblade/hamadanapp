@@ -52,6 +52,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['change_os_status'])){
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>OS <?=h($wo['codigo_os'])?> — <?=h($wo['cliente'])?> (<?=$wo['cliente_tipo']?>)</h3>
   <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-secondary" href="/?route=receipt-view&id=<?=$id?>">Imprimir recibo</a>
     <a class="btn btn-outline-secondary" href="/?route=labels-print&id=<?=$id?>">Imprimir etiquetas</a>
     <?php if($can_edit && $_SESSION['role']==='master'): ?>
       <a class="btn btn-outline-danger" href="/?route=wo-delete&id=<?=$id?>" onclick="return confirm('Remover OS inteira? Esta ação é irreversível.');">Excluir OS</a>
