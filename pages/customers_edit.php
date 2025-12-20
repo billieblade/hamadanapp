@@ -10,6 +10,14 @@ $st->execute([$id]);
 $c=$st->fetch();
 if(!$c){ echo "<div class='alert alert-danger'>Cliente não encontrado.</div>"; return; }
 
+$pendingOsStmt = $pdo->prepare("SELECT id, codigo_os, created_at, total, status_pagamento
+                                FROM work_orders
+                                WHERE customer_id = ?
+                                  AND status_pagamento IN ('pendente','inadimplente')
+                                ORDER BY created_at DESC");
+$pendingOsStmt->execute([$id]);
+$pendingOs = $pendingOsStmt->fetchAll();
+
 if($_SERVER['REQUEST_METHOD']==='POST'){
   $u=$pdo->prepare("UPDATE customers SET nome=?, tipo=?, cpf_cnpj=?, email=?, telefone=?, endereco=?, observacoes=? WHERE id=?");
   $u->execute([
@@ -31,6 +39,36 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
       Tipo: <span class="badge bg-<?= $c['tipo']==='final' ? 'secondary':'info' ?>"><?=h($c['tipo'])?></span>
       <?php if(!empty($c['email'])): ?> — E-mail: <strong><?=h($c['email'])?></strong><?php endif; ?>
       <?php if(!empty($c['telefone'])): ?> — Tel: <strong><?=h($c['telefone'])?></strong><?php endif; ?>
+    </div>
+  <?php endif; ?>
+
+  <?php if($pendingOs): ?>
+    <div class="alert alert-warning">
+      <strong>Cliente com OS em aberto.</strong>
+      Existem <?=count($pendingOs)?> OS com pagamento pendente/inadimplente.
+    </div>
+    <div class="card mb-3">
+      <div class="card-header">OS pendentes</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-striped mb-0">
+            <thead>
+              <tr><th>#</th><th>Código</th><th>Status pagamento</th><th>Total</th><th>Data</th></tr>
+            </thead>
+            <tbody>
+              <?php foreach($pendingOs as $os): ?>
+                <tr>
+                  <td><?=$os['id']?></td>
+                  <td><a href="/?route=wo-view&id=<?=$os['id']?>"><?=h($os['codigo_os'])?></a></td>
+                  <td><?=h($os['status_pagamento'])?></td>
+                  <td class="text-nowrap">R$ <?=number_format($os['total'],2,',','.')?></td>
+                  <td><?=h($os['created_at'])?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   <?php endif; ?>
 
