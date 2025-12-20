@@ -1,6 +1,9 @@
 <?php
 require_role(['master']);
-ensure_services_catalog($pdo);
+if (!ensure_services_catalog($pdo)) {
+  echo "<div class='alert alert-danger'>Catálogo de serviços indisponível. Execute a migration do banco (sql/migrations/001_unify_quote_os_schema.sql) para criar a tabela services_all.</div>";
+  return;
+}
 
 $CATS=['CORTINAS','PERSIANAS','CARPETE','ESTOFADOS','TAPETES'];
 $msg=''; $err='';

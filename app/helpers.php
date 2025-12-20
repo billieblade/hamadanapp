@@ -26,31 +26,34 @@ function flash_get(){
   return null;
 }
 
-function ensure_services_catalog(PDO $pdo): void {
+function ensure_services_catalog(PDO $pdo): bool {
   static $done = false;
+  static $ready = true;
   if ($done) {
-    return;
+    return $ready;
   }
   $done = true;
 
   try {
     $count = (int)$pdo->query("SELECT COUNT(*) FROM services_all")->fetchColumn();
   } catch (Exception $e) {
-    return;
+    $ready = false;
+    return $ready;
   }
 
   if ($count > 0) {
-    return;
+    return $ready;
   }
 
   try {
     $legacyCount = (int)$pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
   } catch (Exception $e) {
-    return;
+    $ready = false;
+    return $ready;
   }
 
   if ($legacyCount === 0) {
-    return;
+    return $ready;
   }
 
   $stmt = $pdo->prepare(
@@ -65,4 +68,5 @@ function ensure_services_catalog(PDO $pdo): void {
      )"
   );
   $stmt->execute();
+  return $ready;
 }
