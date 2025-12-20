@@ -34,6 +34,7 @@ switch($route){
   case 'os-view':           include __DIR__.'/pages/os_view.php'; break;
 
   case 'labels-print':      include __DIR__.'/pages/labels_print.php'; break;
+  case 'receipt-view':      include __DIR__.'/pages/receipt_view.php'; break;
   case 'status-update':     include __DIR__.'/pages/status_update.php'; break;
   case 'reports':           include __DIR__.'/pages/reports.php'; break;
 
