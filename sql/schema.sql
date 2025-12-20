@@ -105,6 +105,16 @@ CREATE TABLE IF NOT EXISTS work_orders (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS receipts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  work_order_id INT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  forma_pagto ENUM('dinheiro','debito','credito','pix') NOT NULL,
+  emitido_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  observacao TEXT,
+  FOREIGN KEY (work_order_id) REFERENCES work_orders(id)
+);
+
 CREATE TABLE IF NOT EXISTS work_order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   work_order_id INT NOT NULL,

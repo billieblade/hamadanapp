@@ -7,7 +7,7 @@ require __DIR__.'/app/helpers.php';
 $route = $_GET['route'] ?? 'dashboard';
 
 // Rotas públicas (não exigem login)
-$PUBLIC_ROUTES = ['wo-view'];
+$PUBLIC_ROUTES = ['wo-view', 'receipt-view'];
 
 // Gate de login: só bloqueia se NÃO for rota pública
 if (!in_array($route, $PUBLIC_ROUTES, true) && empty($_SESSION['uid']) && basename($_SERVER['PHP_SELF']) !== 'login.php') {
@@ -32,6 +32,7 @@ switch($route){
   case 'wo-view':           include __DIR__.'/pages/wo_view.php'; break;   // ← PÚBLICA
   case 'wo-delete':         include __DIR__.'/pages/wo_delete.php'; break;
   case 'os-view':           include __DIR__.'/pages/os_view.php'; break;
+  case 'receipt-view':      include __DIR__.'/pages/receipt_view.php'; break;
 
   case 'labels-print':      include __DIR__.'/pages/labels_print.php'; break;
   case 'receipt-view':      include __DIR__.'/pages/receipt_view.php'; break;

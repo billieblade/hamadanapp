@@ -102,9 +102,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
 
   if (!$err && $cliente) {
     // 1) cria orçamento rascunho
+    $forma_pagto = trim($_POST['forma_pagto'] ?? '');
+    $forma_pagto = ($forma_pagto === '') ? null : $forma_pagto;
     $ins = $pdo->prepare("INSERT INTO quotes (customer_id,user_id,price_list_id,forma_pagto,status,subtotal,desconto,total)
                           VALUES (?,?,?,?, 'rascunho',0,0,0)");
-    $ins->execute([$customer_id, $_SESSION['uid'], null, $_POST['forma_pagto'] ?? null]);
+    $ins->execute([$customer_id, $_SESSION['uid'], null, $forma_pagto]);
     $qid = $pdo->lastInsertId();
 
     // indexa serviços por id
