@@ -231,14 +231,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
         }
       }
 
-      // 6) cria recibo automático, se forma de pagamento já definida
-      if ($forma_pagto) {
-        $pdo->prepare("INSERT INTO receipts (work_order_id, valor, forma_pagto, observacao)
-                       VALUES (?,?,?,?)")
-            ->execute([$woid, $total, $forma_pagto, null]);
-      }
-
-      // 7) redireciona para OS
+      // 6) redireciona para OS
       redirect('/?route=os-view&id='.$woid);
     }
   }

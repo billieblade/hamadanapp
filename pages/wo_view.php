@@ -45,6 +45,23 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['change_os_status'])){
   if(!$can_edit){ http_response_code(403); die('Acesso negado'); }
   $st = $_POST['os_status'] ?? 'aberta';
   $pdo->prepare("UPDATE work_orders SET status=? WHERE id=?")->execute([$st,$id]);
+  if ($st === 'fechada') {
+    $det = $pdo->prepare("SELECT wo.total, q.forma_pagto
+                          FROM work_orders wo
+                          LEFT JOIN quotes q ON q.id = wo.quote_id
+                          WHERE wo.id = ?");
+    $det->execute([$id]);
+    $det = $det->fetch();
+    if ($det && !empty($det['forma_pagto'])) {
+      $chk = $pdo->prepare("SELECT id FROM receipts WHERE work_order_id=? LIMIT 1");
+      $chk->execute([$id]);
+      if (!$chk->fetch()) {
+        $pdo->prepare("INSERT INTO receipts (work_order_id, valor, forma_pagto, observacao)
+                       VALUES (?,?,?,?)")
+            ->execute([$id, $det['total'], $det['forma_pagto'], null]);
+      }
+    }
+  }
   flash_set('Status da OS atualizado.');
   redirect('/?route=wo-view&id='.$id);
 }
