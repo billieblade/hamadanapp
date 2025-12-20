@@ -1,9 +1,18 @@
 <?php
 require_login();
 $q = trim($_GET['q'] ?? '');
-$sql = "SELECT * FROM customers WHERE 1=1"; $params=[];
-if($q!==''){ $sql.=" AND (nome LIKE ? OR email LIKE ? OR telefone LIKE ?)"; $params=['%'.$q.'%','%'.$q.'%','%'.$q.'%']; }
-$sql.=" ORDER BY id DESC LIMIT 300";
+$sql = "SELECT c.*,
+        (SELECT COUNT(*)
+         FROM work_orders wo
+         WHERE wo.customer_id = c.id
+           AND wo.status_pagamento IN ('pendente','inadimplente')) AS pending_os_count
+        FROM customers c WHERE 1=1";
+$params = [];
+if($q!==''){
+  $sql.=" AND (c.nome LIKE ? OR c.email LIKE ? OR c.telefone LIKE ?)";
+  $params=['%'.$q.'%','%'.$q.'%','%'.$q.'%'];
+}
+$sql.=" ORDER BY c.id DESC LIMIT 300";
 $rows = $pdo->prepare($sql); $rows->execute($params); $rows=$rows->fetchAll();
 ?>
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
@@ -21,7 +30,12 @@ $rows = $pdo->prepare($sql); $rows->execute($params); $rows=$rows->fetchAll();
 <?php foreach($rows as $r): ?>
 <tr>
   <td><?=$r['id']?></td>
-  <td><?=h($r['nome'])?></td>
+  <td>
+    <?=h($r['nome'])?>
+    <?php if((int)($r['pending_os_count'] ?? 0) > 0): ?>
+      <span class="badge bg-warning text-dark ms-1">Cliente com OS em aberto</span>
+    <?php endif; ?>
+  </td>
   <td><span class="badge bg-<?= $r['tipo']==='final' ? 'secondary':'info' ?>"><?=h($r['tipo'])?></span></td>
   <td><?=h($r['email'])?></td>
   <td><?=h($r['telefone'])?></td>
