@@ -31,7 +31,7 @@ $novo_cliente = [
   'endereco'  => trim($_POST['novo_endereco'] ?? ''),
   'telefone'  => trim($_POST['novo_telefone'] ?? ''),
   'email'     => trim($_POST['novo_email'] ?? ''),
-  'obs'       => trim($_POST['novo_obs'] ?? ''),
+  'observacoes' => trim($_POST['novo_obs'] ?? ''),
 ];
 
 // -------------------------------------------------------------------
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
     } elseif ($novo_nome === '') {
       $err = 'Informe o nome do novo cliente.';
     } else {
-      $insCliente = $pdo->prepare("INSERT INTO customers (tipo,nome,cpf_cnpj,endereco,telefone,email,obs) VALUES (?,?,?,?,?,?,?)");
+      $insCliente = $pdo->prepare("INSERT INTO customers (tipo,nome,cpf_cnpj,endereco,telefone,email,observacoes) VALUES (?,?,?,?,?,?,?)");
       $insCliente->execute([$novo_tipo,$novo_nome,$novo_doc,$novo_endereco,$novo_tel,$novo_email,$novo_obs]);
       $customer_id = (int)$pdo->lastInsertId();
       $cliente = ['id'=>$customer_id,'nome'=>$novo_nome,'tipo'=>$novo_tipo];
@@ -150,6 +150,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
 
       $m2         = area_m2($tipo_peca, $larg_cm, $comp_cm, $diam_cm);
       $qtd_pecas  = max(0.0001, $qtd);
+      $item_subtotal = 0.0;
 
       foreach ($servicos as $svc_info) {
         $svc = $by_id[$svc_info['id']];
@@ -169,8 +170,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
         $ins2->execute([$qi_id, $svc_info['id'], $qtd_pecas * $multiplicador, $unit, $sub]);
 
         $subtotal_geral += $sub;
+        $item_subtotal += $sub;
       }
 
+      $pdo->prepare("UPDATE quote_items SET subtotal=? WHERE id=?")->execute([$item_subtotal, $qi_id]);
       $total_itens++;
     }
 
@@ -186,18 +189,44 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
 
       // 4) cria OS
       $codigo = 'OS-'.date('ymd').'-'.str_pad((string)$qid,4,'0',STR_PAD_LEFT);
-      $pdo->prepare("INSERT INTO work_orders (quote_id,codigo_os,status) VALUES (?,?, 'aberta')")
-          ->execute([$qid,$codigo]);
+      $pdo->prepare("INSERT INTO work_orders (quote_id,codigo_os,customer_id,user_id,status,subtotal,desconto,total)
+                     VALUES (?,?,?,?, 'aberta',?,?,?)")
+          ->execute([$qid,$codigo,$customer_id,$_SESSION['uid'],$subtotal_geral,$desconto,$total]);
       $woid = $pdo->lastInsertId();
 
-      // 5) etiquetas (1 por peça)
+      // 5) etiquetas (1 por peça) + replica serviços no nível da OS
       $qi = $pdo->prepare("SELECT id FROM quote_items WHERE quote_id=?");
       $qi->execute([$qid]);
+      $svc_fetch = $pdo->prepare("SELECT qis.service_all_id, qis.qtd, qis.preco_unitario, qis.subtotal, s.unidade
+                                  FROM quote_item_services qis
+                                  JOIN services_all s ON s.id = qis.service_all_id
+                                  WHERE qis.quote_item_id=?");
+      $ins_work_svc = $pdo->prepare("INSERT INTO work_item_services (work_item_id,service_id,unidade,qtd,preco_unitario,subtotal)
+                                     VALUES (?,?,?,?,?,?)");
       foreach ($qi as $row) {
         $label = 'ET-'.date('ymd').'-'.$row['id'];
-        $pdo->prepare("INSERT INTO work_order_items (work_order_id,quote_item_id,etiqueta_codigo,status_item)
-                       VALUES (?,?,?,'EM_TRANSITO')")
-            ->execute([$woid,$row['id'],$label]);
+        $svc_fetch->execute([$row['id']]);
+        $svc_rows = $svc_fetch->fetchAll();
+        $item_subtotal = 0.0;
+        foreach ($svc_rows as $svc_row) {
+          $item_subtotal += (float)$svc_row['subtotal'];
+        }
+
+        $pdo->prepare("INSERT INTO work_order_items (work_order_id,quote_item_id,etiqueta_codigo,status_item,subtotal)
+                       VALUES (?,?,?,'EM_TRANSITO',?)")
+            ->execute([$woid,$row['id'],$label,$item_subtotal]);
+        $wo_item_id = $pdo->lastInsertId();
+
+        foreach ($svc_rows as $svc_row) {
+          $ins_work_svc->execute([
+            $wo_item_id,
+            $svc_row['service_all_id'],
+            $svc_row['unidade'],
+            $svc_row['qtd'],
+            $svc_row['preco_unitario'],
+            $svc_row['subtotal'],
+          ]);
+        }
       }
 
       // 6) redireciona para OS
@@ -273,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
               </div>
               <div class="col-md-12">
                 <label class="form-label">Observação</label>
-                <input name="novo_obs" class="form-control form-control-sm" value="<?=h($novo_cliente['obs'])?>"<?=($customer_mode==='new'?'':' disabled')?>>
+                <input name="novo_obs" class="form-control form-control-sm" value="<?=h($novo_cliente['observacoes'])?>"<?=($customer_mode==='new'?'':' disabled')?>>
               </div>
             </div>
           </div>
