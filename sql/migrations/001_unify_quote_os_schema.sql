@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS quote_items (
   FOREIGN KEY (quote_id) REFERENCES quotes(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE quote_items
+  ADD COLUMN IF NOT EXISTS lacre_numero VARCHAR(60) NULL;
+
 CREATE TABLE IF NOT EXISTS quote_item_services (
   id INT AUTO_INCREMENT PRIMARY KEY,
   quote_item_id INT NOT NULL,
@@ -137,7 +140,8 @@ CREATE INDEX IF NOT EXISTS idx_receipts_work_order ON receipts(work_order_id);
 -- Work order items: ensure quote reference + subtotal
 ALTER TABLE work_order_items
   ADD COLUMN IF NOT EXISTS quote_item_id INT NULL,
-  ADD COLUMN IF NOT EXISTS subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00;
+  ADD COLUMN IF NOT EXISTS subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  ADD COLUMN IF NOT EXISTS lacre_numero VARCHAR(60) NULL;
 
 SET @fk_work_order_items_quote_item := (
   SELECT CONSTRAINT_NAME

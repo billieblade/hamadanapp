@@ -263,7 +263,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['save_payment'])){
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-sm table-striped mb-0">
-            <thead><tr><th>#</th><th>Etiqueta</th><th>Serviços</th><th>Status</th><th>Subtotal</th></tr></thead>
+            <thead><tr><th>#</th><th>Etiqueta</th><th>Lacre</th><th>Serviços</th><th>Status</th><th>Subtotal</th></tr></thead>
             <tbody>
             <?php foreach($items as $it):
               $svcs->execute([$it['id']]);
@@ -274,6 +274,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['save_payment'])){
                   <code><?=$it['etiqueta_codigo']?></code><br>
                   <a class="btn btn-sm btn-outline-secondary mt-1" href="/?route=labels-print&id=<?=$id?>&single=<?=$it['id']?>">Etiqueta</a>
                 </td>
+                <td><?=h($it['lacre_numero'] ?? '—')?></td>
                 <td>
                   <ul class="mb-0">
                     <?php foreach($linhas as $l): ?>
@@ -299,7 +300,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['save_payment'])){
                 <td class="text-nowrap">R$ <?=number_format($it['subtotal'],2,',','.')?></td>
               </tr>
             <?php endforeach; if(!$items): ?>
-              <tr><td colspan="5" class="text-center p-4">Sem peças nesta OS.</td></tr>
+              <tr><td colspan="6" class="text-center p-4">Sem peças nesta OS.</td></tr>
             <?php endif; ?>
             </tbody>
           </table>

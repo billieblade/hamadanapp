@@ -1,5 +1,6 @@
 <?php
 require_role(['master']);
+ensure_services_catalog($pdo);
 
 $CATS=['CORTINAS','PERSIANAS','CARPETE','ESTOFADOS','TAPETES'];
 $msg=''; $err='';
@@ -7,7 +8,7 @@ $msg=''; $err='';
 // ---------- Ações ----------
 if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['add'])){
   try{
-    $st=$pdo->prepare("INSERT INTO services (categoria,nome,unidade,preco_final,preco_corporativo,observacao,ativo)
+    $st=$pdo->prepare("INSERT INTO services_all (categoria,nome,unidade,preco_final,preco_corporativo,observacao,ativo)
                        VALUES (?,?,?,?,?,?,1)");
     $st->execute([
       $_POST['categoria'],
@@ -23,7 +24,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['add'])){
 
 if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['save'])){
   try{
-    $st=$pdo->prepare("UPDATE services SET preco_final=?,preco_corporativo=? WHERE id=?");
+    $st=$pdo->prepare("UPDATE services_all SET preco_final=?,preco_corporativo=? WHERE id=?");
     $st->execute([$_POST['preco_final'],$_POST['preco_corporativo'],(int)$_POST['id']]);
     $msg='Preços salvos.';
   }catch(Exception $e){ $err='Erro ao salvar: '.$e->getMessage(); }
@@ -34,7 +35,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete'])){
   $id=(int)$_POST['id'];
   try{
     // Sempre usar soft delete para não quebrar FKs/OS antigas
-    $pdo->prepare("UPDATE services SET ativo=0 WHERE id=?")->execute([$id]);
+    $pdo->prepare("UPDATE services_all SET ativo=0 WHERE id=?")->execute([$id]);
     $msg='Serviço desativado (excluído) com sucesso.';
   }catch(Exception $e){ $err='Erro ao excluir: '.$e->getMessage(); }
 }
@@ -43,7 +44,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete'])){
 if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['restore'])){
   $id=(int)$_POST['id'];
   try{
-    $pdo->prepare("UPDATE services SET ativo=1 WHERE id=?")->execute([$id]);
+    $pdo->prepare("UPDATE services_all SET ativo=1 WHERE id=?")->execute([$id]);
     $msg='Serviço restaurado com sucesso.';
   }catch(Exception $e){ $err='Erro ao restaurar: '.$e->getMessage(); }
 }
@@ -53,7 +54,7 @@ $f_cat = $_GET['cat'] ?? '';
 $q     = trim($_GET['q'] ?? '');
 $show_inactive = isset($_GET['show_inactive']) && $_GET['show_inactive']=='1';
 
-$sql = "SELECT * FROM services WHERE 1=1";
+$sql = "SELECT * FROM services_all WHERE 1=1";
 $p   = [];
 if(!$show_inactive){
   $sql .= " AND ativo=1";

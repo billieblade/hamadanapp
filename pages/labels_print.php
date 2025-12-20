@@ -16,6 +16,9 @@ $cfg=require __DIR__.'/../app/config.php'; $base = rtrim($cfg['app']['base_url']
     <div class="label-left">
       <img src="/assets/hamadan-logo.png" class="logo" alt="Hamadan">
       <div class="code"><?=h($it['etiqueta_codigo'])?></div>
+      <?php if(!empty($it['lacre_numero'])): ?>
+        <small>Lacre: <?=h($it['lacre_numero'])?></small>
+      <?php endif; ?>
       <small>OS: <?=h($it['codigo_os'])?></small>
       <small><?=h($it['cliente'])?></small>
     </div>

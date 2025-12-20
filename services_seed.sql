@@ -1,5 +1,5 @@
 -- Serviços iniciais (valores 0.00 para edição posterior)
-INSERT INTO services (categoria, nome, unidade, preco_final, preco_corporativo, ativo) VALUES
+INSERT INTO services_all (categoria, nome, unidade, preco_final, preco_corporativo, ativo) VALUES
 ('CORTINAS','Forro de Cortina','m2',0,0,1),
 ('CORTINAS','Cortina de Seda','m2',0,0,1),
 ('CORTINAS','Cortina demais tecidos','m2',0,0,1),
