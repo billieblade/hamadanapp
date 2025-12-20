@@ -18,6 +18,10 @@ if(!$wo){
   return;
 }
 
+$receipt_stmt = $pdo->prepare("SELECT * FROM receipts WHERE work_order_id=? ORDER BY emitido_em DESC, id DESC LIMIT 1");
+$receipt_stmt->execute([$id]);
+$receipt = $receipt_stmt->fetch();
+
 $items = $pdo->prepare("SELECT * FROM work_order_items WHERE work_order_id=? ORDER BY id");
 $items->execute([$id]);
 $items = $items->fetchAll();
@@ -52,24 +56,42 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['change_os_status'])){
                           WHERE wo.id = ?");
     $det->execute([$id]);
     $det = $det->fetch();
-    if ($det && !empty($det['forma_pagto'])) {
-      $chk = $pdo->prepare("SELECT id FROM receipts WHERE work_order_id=? LIMIT 1");
-      $chk->execute([$id]);
-      if (!$chk->fetch()) {
-        $pdo->prepare("INSERT INTO receipts (work_order_id, valor, forma_pagto, observacao)
-                       VALUES (?,?,?,?)")
-            ->execute([$id, $det['total'], $det['forma_pagto'], null]);
-      }
+    if ($det && !empty($det['forma_pagto']) && !$receipt) {
+      $pdo->prepare("INSERT INTO receipts (work_order_id, valor, forma_pagto, observacao)
+                     VALUES (?,?,?,?)")
+          ->execute([$id, $det['total'], $det['forma_pagto'], null]);
     }
   }
   flash_set('Status da OS atualizado.');
+  redirect('/?route=wo-view&id='.$id);
+}
+
+// registra recibo manualmente
+if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_receipt'])){
+  if(!$can_edit){ http_response_code(403); die('Acesso negado'); }
+  $forma_pagto = trim($_POST['receipt_forma_pagto'] ?? '');
+  $valor = (float)($_POST['receipt_valor'] ?? 0);
+  $obs = trim($_POST['receipt_obs'] ?? '');
+
+  if ($forma_pagto === '' || $valor <= 0) {
+    flash_set('Informe a forma de pagamento e um valor válido.', 'danger');
+    redirect('/?route=wo-view&id='.$id);
+  }
+
+  $pdo->prepare("INSERT INTO receipts (work_order_id, valor, forma_pagto, observacao)
+                 VALUES (?,?,?,?)")
+      ->execute([$id, $valor, $forma_pagto, $obs !== '' ? $obs : null]);
+
+  flash_set('Recibo registrado com sucesso.');
   redirect('/?route=wo-view&id='.$id);
 }
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>OS <?=h($wo['codigo_os'])?> — <?=h($wo['cliente'])?> (<?=$wo['cliente_tipo']?>)</h3>
   <div class="d-flex gap-2 flex-wrap">
-    <a class="btn btn-outline-secondary" href="/?route=receipt-view&id=<?=$id?>">Imprimir recibo</a>
+    <?php if($receipt): ?>
+      <a class="btn btn-outline-secondary" href="/?route=receipt-view&id=<?=$id?>">Imprimir recibo</a>
+    <?php endif; ?>
     <a class="btn btn-outline-secondary" href="/?route=labels-print&id=<?=$id?>">Imprimir etiquetas</a>
     <?php if($can_edit && $_SESSION['role']==='master'): ?>
       <a class="btn btn-outline-danger" href="/?route=wo-delete&id=<?=$id?>" onclick="return confirm('Remover OS inteira? Esta ação é irreversível.');">Excluir OS</a>
@@ -115,6 +137,43 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['change_os_status'])){
         <div>Subtotal: <strong>R$ <?=number_format($wo['subtotal'],2,',','.')?></strong></div>
         <div>Desconto: <strong>R$ <?=number_format($wo['desconto'],2,',','.')?></strong></div>
         <div class="h5">Total: <strong>R$ <?=number_format($wo['total'],2,',','.')?></strong></div>
+        <hr>
+        <div class="mb-2"><strong>Recibo de pagamento</strong></div>
+        <?php if($receipt): ?>
+          <div>Valor: <strong>R$ <?=number_format($receipt['valor'],2,',','.')?></strong></div>
+          <div>Forma: <strong><?=h($receipt['forma_pagto'])?></strong></div>
+          <div>Emitido em: <strong><?=h($receipt['emitido_em'])?></strong></div>
+          <?php if(!empty($receipt['observacao'])): ?>
+            <div>Obs.: <?=h($receipt['observacao'])?></div>
+          <?php endif; ?>
+          <div class="mt-2">
+            <a class="btn btn-sm btn-outline-secondary" href="/?route=receipt-view&id=<?=$id?>">Imprimir recibo</a>
+          </div>
+        <?php elseif($can_edit): ?>
+          <form method="post" class="mt-2">
+            <div class="mb-2">
+              <label class="form-label">Forma de pagamento</label>
+              <select name="receipt_forma_pagto" class="form-select form-select-sm" required>
+                <option value="">Selecione</option>
+                <option value="dinheiro">dinheiro</option>
+                <option value="debito">debito</option>
+                <option value="credito">credito</option>
+                <option value="pix">pix</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Valor recebido</label>
+              <input name="receipt_valor" type="number" step="0.01" class="form-control form-control-sm" value="<?=h($wo['total'])?>" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Observação</label>
+              <input name="receipt_obs" class="form-control form-control-sm" placeholder="Opcional">
+            </div>
+            <button class="btn btn-sm btn-success" name="create_receipt" value="1">Registrar recibo</button>
+          </form>
+        <?php else: ?>
+          <div class="text-muted">Nenhum recibo registrado.</div>
+        <?php endif; ?>
       </div>
     </div>
   </div>
