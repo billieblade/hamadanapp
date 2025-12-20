@@ -4,6 +4,8 @@ require_login();
 // TEMP (debug enquanto ajusta): descomente se precisar
 // error_reporting(E_ALL); ini_set('display_errors', 1);
 
+ensure_services_catalog($pdo);
+
 // -------------------------------------------------------------------
 // Carregamentos base
 // -------------------------------------------------------------------
@@ -139,15 +141,16 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
       $diam_cm   = (float)($_POST['diametro_cm'][$i] ?? 0);
       $qtd       = (float)($_POST['qtd'][$i] ?? 1);
       $rotulo    = trim($_POST['peca_nome'][$i] ?? '');
+      $lacre     = trim($_POST['lacre_numero'][$i] ?? '');
 
       $meta = ['origem'=>'quick-add'];
       if ($rotulo !== '') { $meta['rotulo'] = $rotulo; }
 
       // 2.1) cria peça (quote_item)
       $st = $pdo->prepare("INSERT INTO quote_items
-        (quote_id,service_id,tipo_tapete,largura_cm,comprimento_cm,diametro_cm,qtd,preco_unitario,regra_aplicada_json,subtotal)
-        VALUES (?,?,?,?,?,?,?,?,?,?)");
-      $st->execute([$qid,null,$tipo_peca,$larg_cm,$comp_cm,$diam_cm,$qtd,0,json_encode($meta),0]);
+        (quote_id,service_id,tipo_tapete,largura_cm,comprimento_cm,diametro_cm,qtd,preco_unitario,regra_aplicada_json,subtotal,lacre_numero)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+      $st->execute([$qid,null,$tipo_peca,$larg_cm,$comp_cm,$diam_cm,$qtd,0,json_encode($meta),0,$lacre]);
       $qi_id = $pdo->lastInsertId();
 
       $m2         = area_m2($tipo_peca, $larg_cm, $comp_cm, $diam_cm);
@@ -197,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
       $woid = $pdo->lastInsertId();
 
       // 5) etiquetas (1 por peça) + replica serviços no nível da OS
-      $qi = $pdo->prepare("SELECT id FROM quote_items WHERE quote_id=?");
+      $qi = $pdo->prepare("SELECT id, lacre_numero FROM quote_items WHERE quote_id=?");
       $qi->execute([$qid]);
       $svc_fetch = $pdo->prepare("SELECT qis.service_all_id, qis.qtd, qis.preco_unitario, qis.subtotal, s.unidade
                                   FROM quote_item_services qis
@@ -214,9 +217,9 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
           $item_subtotal += (float)$svc_row['subtotal'];
         }
 
-        $pdo->prepare("INSERT INTO work_order_items (work_order_id,quote_item_id,etiqueta_codigo,status_item,subtotal)
-                       VALUES (?,?,?,'EM_TRANSITO',?)")
-            ->execute([$woid,$row['id'],$label,$item_subtotal]);
+        $pdo->prepare("INSERT INTO work_order_items (work_order_id,quote_item_id,etiqueta_codigo,lacre_numero,status_item,subtotal)
+                       VALUES (?,?,?,?,'EM_TRANSITO',?)")
+            ->execute([$woid,$row['id'],$label,$row['lacre_numero'],$item_subtotal]);
         $wo_item_id = $pdo->lastInsertId();
 
         foreach ($svc_rows as $svc_row) {
@@ -344,6 +347,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_os'])) {
             <div class="col-md-6 col-lg-4">
               <label class="form-label">Identificação da peça</label>
               <input name="peca_nome[<?=$i?>]" class="form-control form-control-sm" placeholder="Ex: Tapete <?=($i+1)?>">
+            </div>
+            <div class="col-md-3 col-lg-2">
+              <label class="form-label">Número do lacre</label>
+              <input name="lacre_numero[<?=$i?>]" class="form-control form-control-sm" placeholder="Ex: 12345">
             </div>
             <div class="col-md-3 col-lg-2">
               <label class="form-label">Tipo</label>

@@ -25,3 +25,44 @@ function flash_get(){
   }
   return null;
 }
+
+function ensure_services_catalog(PDO $pdo): void {
+  static $done = false;
+  if ($done) {
+    return;
+  }
+  $done = true;
+
+  try {
+    $count = (int)$pdo->query("SELECT COUNT(*) FROM services_all")->fetchColumn();
+  } catch (Exception $e) {
+    return;
+  }
+
+  if ($count > 0) {
+    return;
+  }
+
+  try {
+    $legacyCount = (int)$pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
+  } catch (Exception $e) {
+    return;
+  }
+
+  if ($legacyCount === 0) {
+    return;
+  }
+
+  $stmt = $pdo->prepare(
+    "INSERT INTO services_all (categoria,nome,unidade,preco_final,preco_corporativo,observacao,ativo)
+     SELECT s.categoria, s.nome, s.unidade, s.preco_final, s.preco_corporativo, s.observacao, s.ativo
+     FROM services s
+     WHERE NOT EXISTS (
+       SELECT 1 FROM services_all sa
+       WHERE sa.categoria = s.categoria
+         AND sa.nome = s.nome
+         AND sa.unidade = s.unidade
+     )"
+  );
+  $stmt->execute();
+}

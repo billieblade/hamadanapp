@@ -1,11 +1,37 @@
 <?php
 require_login();
 $q = trim($_GET['q'] ?? '');
+$hasStatusPagamento = (bool)$pdo->query(
+  "SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = DATABASE()
+     AND TABLE_NAME = 'work_orders'
+     AND COLUMN_NAME = 'status_pagamento'"
+)->fetchColumn();
+
+if ($hasStatusPagamento) {
+  $pendingOsExpr = "(
+    SELECT COUNT(*)
+    FROM work_orders wo
+    WHERE wo.customer_id = c.id
+      AND wo.status_pagamento IN ('pendente','inadimplente')
+  )";
+} else {
+  $pendingOsExpr = "(
+    SELECT COUNT(*)
+    FROM work_orders wo
+    WHERE wo.customer_id = c.id
+      AND (
+        wo.total - COALESCE((
+          SELECT SUM(wor.valor)
+          FROM work_order_receipts wor
+          WHERE wor.work_order_id = wo.id
+        ), 0)
+      ) > 0.01
+  )";
+}
+
 $sql = "SELECT c.*,
-        (SELECT COUNT(*)
-         FROM work_orders wo
-         WHERE wo.customer_id = c.id
-           AND wo.status_pagamento IN ('pendente','inadimplente')) AS pending_os_count
+        {$pendingOsExpr} AS pending_os_count
         FROM customers c WHERE 1=1";
 $params = [];
 if($q!==''){

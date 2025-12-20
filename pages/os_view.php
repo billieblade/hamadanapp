@@ -17,7 +17,7 @@ $svcs = $pdo->prepare("SELECT wis.*, s.nome, s.unidade
   <h3>OS <?=$os['codigo_os']?> — <?=h($os['cliente'])?></h3>
   <p>Status: <span class="badge bg-secondary"><?=$os['status']?></span> | Total: R$ <?=number_format($os['total'],2,',','.')?></p>
   <table class="table table-sm table-striped">
-    <thead><tr><th>Item</th><th>Serviços</th><th>Etiqueta</th><th>Ações</th></tr></thead>
+    <thead><tr><th>Item</th><th>Serviços</th><th>Etiqueta</th><th>Lacre</th><th>Ações</th></tr></thead>
     <tbody>
       <?php foreach($items as $i): ?>
       <tr>
@@ -35,6 +35,7 @@ $svcs = $pdo->prepare("SELECT wis.*, s.nome, s.unidade
           <?php endif; ?>
         </td>
         <td><code><?=$i['etiqueta_codigo']?></code></td>
+        <td><?=h($i['lacre_numero'] ?? '—')?></td>
         <td>
           <a class="btn btn-sm btn-outline-primary" href="/?route=labels-print&id=<?=$id?>&single=<?=$i['id']?>">Imprimir etiqueta</a>
         </td>
