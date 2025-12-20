@@ -1,80 +1,85 @@
 <?php
-// pages/receipt_view.php
-$id = (int)($_GET['id'] ?? 0);
+require_login();
+$woId = (int)($_GET['id'] ?? 0);
 
-$st = $pdo->prepare("SELECT r.*, wo.codigo_os, wo.created_at AS wo_created_at, wo.status AS wo_status,
-                            wo.subtotal, wo.desconto, wo.total, c.nome AS cliente_nome, c.tipo AS cliente_tipo,
-                            c.cpf_cnpj, c.email, c.telefone, c.endereco, u.name AS autor
-                     FROM receipts r
+$st = $pdo->prepare("SELECT r.*, wo.codigo_os, wo.total, wo.status_pagamento, c.nome as cliente, c.cpf_cnpj, c.endereco, c.telefone
+                     FROM work_order_receipts r
                      JOIN work_orders wo ON wo.id = r.work_order_id
                      JOIN customers c ON c.id = wo.customer_id
-                     JOIN users u ON u.id = wo.user_id
                      WHERE r.work_order_id = ?
-                     ORDER BY r.emitido_em DESC, r.id DESC
+                     ORDER BY r.id DESC
                      LIMIT 1");
-$st->execute([$id]);
-$recibo = $st->fetch();
+$st->execute([$woId]);
+$receipt = $st->fetch();
 
-if (!$recibo) {
-  echo "<div class='container py-4'><div class='alert alert-danger'>Recibo não encontrado para esta OS.</div></div>";
+if(!$receipt){
+  echo "<div class='container py-4'><div class='alert alert-danger'>Recibo não encontrado.</div></div>";
   return;
 }
-?>
-<!doctype html>
+
+$emitidoEm = $receipt['emitido_em'] ? date('d/m/Y', strtotime($receipt['emitido_em'])) : '';
+?><!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/assets/style.css">
-  <title>Recibo OS <?=h($recibo['codigo_os'])?></title>
-  <style>@media print {.no-print{display:none}}</style>
+  <title>Recibo</title>
+  <style>
+    @media print { .no-print { display: none; } }
+    .receipt-box { border: 1px solid #ddd; padding: 24px; border-radius: 8px; }
+    .receipt-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .receipt-title { font-size: 24px; font-weight: 600; }
+  </style>
 </head>
 <body>
   <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0">Recibo da OS <?=h($recibo['codigo_os'])?></h3>
-      <button class="btn btn-outline-secondary no-print" onclick="window.print()">Imprimir</button>
-    </div>
-
-    <div class="row g-3">
-      <div class="col-lg-6">
-        <div class="card">
-          <div class="card-header">Cliente</div>
-          <div class="card-body">
-            <div><strong><?=h($recibo['cliente_nome'])?></strong> (<?=h($recibo['cliente_tipo'])?>)</div>
-            <?php if(!empty($recibo['cpf_cnpj'])): ?><div>CPF/CNPJ: <?=h($recibo['cpf_cnpj'])?></div><?php endif; ?>
-            <?php if(!empty($recibo['telefone'])): ?><div>Telefone: <?=h($recibo['telefone'])?></div><?php endif; ?>
-            <?php if(!empty($recibo['email'])): ?><div>E-mail: <?=h($recibo['email'])?></div><?php endif; ?>
-            <?php if(!empty($recibo['endereco'])): ?><div>Endereço: <?=h($recibo['endereco'])?></div><?php endif; ?>
-          </div>
+    <button class="btn btn-outline-secondary no-print mb-3" onclick="window.print()">Imprimir</button>
+    <div class="receipt-box">
+      <div class="receipt-header mb-4">
+        <div>
+          <img src="/assets/hamadan-logo.png" alt="Hamadan" style="max-height:64px;">
+        </div>
+        <div class="text-end">
+          <div class="receipt-title">Recibo</div>
+          <div>OS: <strong><?=h($receipt['codigo_os'])?></strong></div>
+          <div>Emitido em: <strong><?=h($emitidoEm)?></strong></div>
         </div>
       </div>
 
-      <div class="col-lg-6">
-        <div class="card">
-          <div class="card-header">Resumo da OS</div>
-          <div class="card-body">
-            <div>Autor: <strong><?=h($recibo['autor'])?></strong></div>
-            <div>Data OS: <strong><?=h($recibo['wo_created_at'])?></strong></div>
-            <div>Status: <strong><?=h($recibo['wo_status'])?></strong></div>
-            <hr>
-            <div>Subtotal: <strong>R$ <?=number_format($recibo['subtotal'],2,',','.')?></strong></div>
-            <div>Desconto: <strong>R$ <?=number_format($recibo['desconto'],2,',','.')?></strong></div>
-            <div>Total: <strong>R$ <?=number_format($recibo['total'],2,',','.')?></strong></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card-header">Detalhes do recibo</div>
-      <div class="card-body">
-        <div>Valor recebido: <strong>R$ <?=number_format($recibo['valor'],2,',','.')?></strong></div>
-        <div>Forma de pagamento: <strong><?=h($recibo['forma_pagto'])?></strong></div>
-        <div>Emitido em: <strong><?=h($recibo['emitido_em'])?></strong></div>
-        <?php if(!empty($recibo['observacao'])): ?>
-          <div class="mt-2">Observação: <?=h($recibo['observacao'])?></div>
+      <div class="mb-3">
+        <div><strong>Cliente:</strong> <?=h($receipt['cliente'])?></div>
+        <?php if(!empty($receipt['cpf_cnpj'])): ?>
+          <div><strong>CPF/CNPJ:</strong> <?=h($receipt['cpf_cnpj'])?></div>
         <?php endif; ?>
+        <?php if(!empty($receipt['telefone'])): ?>
+          <div><strong>Telefone:</strong> <?=h($receipt['telefone'])?></div>
+        <?php endif; ?>
+        <?php if(!empty($receipt['endereco'])): ?>
+          <div><strong>Endereço:</strong> <?=h($receipt['endereco'])?></div>
+        <?php endif; ?>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div><strong>Valor:</strong> R$ <?=number_format($receipt['valor'],2,',','.')?></div>
+          <div><strong>Forma de pagamento:</strong> <?=h($receipt['forma_pagto'] ?: '-')?></div>
+        </div>
+        <div class="col-md-6">
+          <div><strong>Banco:</strong> <?=h($receipt['banco'] ?: '-')?></div>
+          <div><strong>Status:</strong> <?=h($receipt['status_pagamento'])?></div>
+        </div>
+      </div>
+
+      <?php if(!empty($receipt['observacao'])): ?>
+        <div class="mb-3">
+          <strong>Observação:</strong>
+          <div><?=nl2br(h($receipt['observacao']))?></div>
+        </div>
+      <?php endif; ?>
+
+      <div class="mt-4">
+        <div>Assinatura: ____________________________________________</div>
       </div>
     </div>
   </div>

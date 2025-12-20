@@ -18,9 +18,9 @@ if(!$wo){
   return;
 }
 
-$receipt_stmt = $pdo->prepare("SELECT * FROM receipts WHERE work_order_id=? ORDER BY emitido_em DESC, id DESC LIMIT 1");
-$receipt_stmt->execute([$id]);
-$receipt = $receipt_stmt->fetch();
+$receiptStmt = $pdo->prepare("SELECT * FROM work_order_receipts WHERE work_order_id=? ORDER BY id DESC LIMIT 1");
+$receiptStmt->execute([$id]);
+$receipt = $receiptStmt->fetch();
 
 $items = $pdo->prepare("SELECT * FROM work_order_items WHERE work_order_id=? ORDER BY id");
 $items->execute([$id]);
@@ -66,23 +66,52 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['change_os_status'])){
   redirect('/?route=wo-view&id='.$id);
 }
 
-// registra recibo manualmente
-if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_receipt'])){
+// atualiza status de pagamento e gera recibo
+if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['save_payment'])){
   if(!$can_edit){ http_response_code(403); die('Acesso negado'); }
-  $forma_pagto = trim($_POST['receipt_forma_pagto'] ?? '');
-  $valor = (float)($_POST['receipt_valor'] ?? 0);
-  $obs = trim($_POST['receipt_obs'] ?? '');
-
-  if ($forma_pagto === '' || $valor <= 0) {
-    flash_set('Informe a forma de pagamento e um valor válido.', 'danger');
-    redirect('/?route=wo-view&id='.$id);
+  $statusPagamento = $_POST['status_pagamento'] ?? 'pendente';
+  $validStatus = ['pendente','pago','inadimplente'];
+  if(!in_array($statusPagamento, $validStatus, true)){
+    $statusPagamento = 'pendente';
   }
 
-  $pdo->prepare("INSERT INTO receipts (work_order_id, valor, forma_pagto, observacao)
-                 VALUES (?,?,?,?)")
-      ->execute([$id, $valor, $forma_pagto, $obs !== '' ? $obs : null]);
+  $pdo->prepare("UPDATE work_orders SET status_pagamento=? WHERE id=?")
+      ->execute([$statusPagamento,$id]);
 
-  flash_set('Recibo registrado com sucesso.');
+  if($statusPagamento === 'pago'){
+    $valorRaw = trim((string)($_POST['valor'] ?? ''));
+    if($valorRaw === ''){
+      $valor = (float)$wo['total'];
+    } else {
+      $valorNormalized = str_replace(' ', '', $valorRaw);
+      if(strpos($valorNormalized, ',') !== false){
+        $valorNormalized = str_replace('.', '', $valorNormalized);
+        $valorNormalized = str_replace(',', '.', $valorNormalized);
+      }
+      $valor = (float)$valorNormalized;
+    }
+
+    $formaPagto = trim((string)($_POST['forma_pagto'] ?? ''));
+    $banco = trim((string)($_POST['banco'] ?? ''));
+    $emitidoEm = trim((string)($_POST['emitido_em'] ?? ''));
+    if($emitidoEm === ''){
+      $emitidoEm = date('Y-m-d');
+    }
+    if(strlen($emitidoEm) === 10){
+      $emitidoEm .= ' 00:00:00';
+    }
+    $observacao = trim((string)($_POST['observacao'] ?? ''));
+
+    if($receipt){
+      $pdo->prepare("UPDATE work_order_receipts SET valor=?, forma_pagto=?, banco=?, emitido_em=?, observacao=? WHERE id=?")
+          ->execute([$valor,$formaPagto,$banco,$emitidoEm,$observacao,$receipt['id']]);
+    } else {
+      $pdo->prepare("INSERT INTO work_order_receipts (work_order_id,valor,forma_pagto,banco,emitido_em,observacao) VALUES (?,?,?,?,?,?)")
+          ->execute([$id,$valor,$formaPagto,$banco,$emitidoEm,$observacao]);
+    }
+  }
+
+  flash_set('Status de pagamento atualizado.');
   redirect('/?route=wo-view&id='.$id);
 }
 ?>
@@ -93,6 +122,9 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_receipt'])){
       <a class="btn btn-outline-secondary" href="/?route=receipt-view&id=<?=$id?>">Imprimir recibo</a>
     <?php endif; ?>
     <a class="btn btn-outline-secondary" href="/?route=labels-print&id=<?=$id?>">Imprimir etiquetas</a>
+    <?php if($can_edit && $receipt): ?>
+      <a class="btn btn-outline-secondary" href="/?route=receipt-view&id=<?=$id?>">Imprimir recibo</a>
+    <?php endif; ?>
     <?php if($can_edit && $_SESSION['role']==='master'): ?>
       <a class="btn btn-outline-danger" href="/?route=wo-delete&id=<?=$id?>" onclick="return confirm('Remover OS inteira? Esta ação é irreversível.');">Excluir OS</a>
     <?php endif; ?>
@@ -128,6 +160,52 @@ if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['create_receipt'])){
         <hr>
         <?php else: ?>
           <div>Status OS: <strong><?=h($wo['status'])?></strong></div>
+          <hr>
+        <?php endif; ?>
+
+        <?php if($can_edit): ?>
+        <form method="post" class="mt-3">
+          <div class="row g-2 align-items-end">
+            <div class="col-12">
+              <label class="form-label">Status pagamento</label>
+              <select name="status_pagamento" class="form-select">
+                <?php foreach(['pendente','pago','inadimplente'] as $s): ?>
+                  <option value="<?=$s?>" <?=$wo['status_pagamento']===$s?'selected':''?>><?=$s?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Valor</label>
+              <input class="form-control" name="valor" value="<?=h($receipt['valor'] ?? $wo['total'])?>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Forma de pagamento</label>
+              <select class="form-select" name="forma_pagto">
+                <?php foreach(['dinheiro','debito','credito','pix','transferencia','boleto'] as $f): ?>
+                  <option value="<?=$f?>" <?=($receipt['forma_pagto'] ?? '')===$f?'selected':''?>><?=$f?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Banco</label>
+              <input class="form-control" name="banco" value="<?=h($receipt['banco'] ?? '')?>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Emitido em</label>
+              <input class="form-control" type="date" name="emitido_em" value="<?=h(isset($receipt['emitido_em']) ? substr($receipt['emitido_em'],0,10) : date('Y-m-d'))?>">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Observação</label>
+              <textarea class="form-control" name="observacao" rows="2"><?=h($receipt['observacao'] ?? '')?></textarea>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" name="save_payment" value="1">Salvar pagamento</button>
+            </div>
+          </div>
+        </form>
+        <hr>
+        <?php else: ?>
+          <div>Status pagamento: <strong><?=h($wo['status_pagamento'])?></strong></div>
           <hr>
         <?php endif; ?>
 
