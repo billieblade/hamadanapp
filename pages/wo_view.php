@@ -22,9 +22,9 @@ $items = $pdo->prepare("SELECT * FROM work_order_items WHERE work_order_id=? ORD
 $items->execute([$id]);
 $items = $items->fetchAll();
 
-$svcs = $pdo->prepare("SELECT w.*, s.nome 
-                       FROM work_item_services w 
-                       JOIN services s ON s.id = w.service_id 
+$svcs = $pdo->prepare("SELECT w.*, s.nome
+                       FROM work_item_services w
+                       JOIN services_all s ON s.id = w.service_id
                        WHERE w.work_item_id = ?");
 
 $can_edit = (!empty($_SESSION['role']) && in_array($_SESSION['role'], ['master','funcionario'], true));

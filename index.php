@@ -24,11 +24,14 @@ switch($route){
   case 'customers-edit':    include __DIR__.'/pages/customers_edit.php'; break;
   case 'customers-delete':  include __DIR__.'/pages/customers_delete.php'; break;
 
+  case 'quotes-new':        include __DIR__.'/pages/quotes_new.php'; break;
+
   case 'services':          include __DIR__.'/pages/services.php'; break;
 
   case 'wo-new':            include __DIR__.'/pages/wo_new.php'; break;
   case 'wo-view':           include __DIR__.'/pages/wo_view.php'; break;   // ← PÚBLICA
   case 'wo-delete':         include __DIR__.'/pages/wo_delete.php'; break;
+  case 'os-view':           include __DIR__.'/pages/os_view.php'; break;
 
   case 'labels-print':      include __DIR__.'/pages/labels_print.php'; break;
   case 'status-update':     include __DIR__.'/pages/status_update.php'; break;

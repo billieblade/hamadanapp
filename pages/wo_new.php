@@ -1,6 +1,10 @@
 <?php
 require_login();
 
+$redirect_target = '/?route=quotes-new';
+flash_set('Fluxo antigo desativado. Use o cadastro de OS por peça e múltiplos serviços.', 'info');
+redirect($redirect_target);
+
 $clientes = $pdo->query("SELECT id,nome,tipo FROM customers ORDER BY nome")->fetchAll();
 $servs    = $pdo->query("SELECT * FROM services WHERE ativo=1 ORDER BY categoria,nome")->fetchAll();
 $byId=[]; foreach($servs as $s){ $byId[$s['id']]=$s; }
